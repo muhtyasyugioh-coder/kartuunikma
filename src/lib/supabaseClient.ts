@@ -13,19 +13,28 @@ export async function getSupabaseInit(): Promise<{
 }> {
   if (!clientPromise) {
     clientPromise = (async () => {
-      const res = await fetch('/api/public-config');
-      const config = (await res.json()) as PublicConfigResponse;
-      if (!config.configured || !config.supabaseUrl || !config.supabaseAnonKey) {
-        return { supabase: null, config };
+      try {
+        const res = await fetch('/api/public-config');
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+        const config = (await res.json()) as PublicConfigResponse;
+        if (!config.configured || !config.supabaseUrl || !config.supabaseAnonKey) {
+          clientPromise = null;
+          return { supabase: null, config };
+        }
+        const supabase = createClient(config.supabaseUrl, config.supabaseAnonKey, {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            detectSessionInUrl: true,
+          },
+        });
+        return { supabase, config };
+      } catch (err) {
+        clientPromise = null;
+        throw err;
       }
-      const supabase = createClient(config.supabaseUrl, config.supabaseAnonKey, {
-        auth: {
-          persistSession: true,
-          autoRefreshToken: true,
-          detectSessionInUrl: true,
-        },
-      });
-      return { supabase, config };
     })();
   }
   return clientPromise;

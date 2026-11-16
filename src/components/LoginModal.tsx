@@ -26,17 +26,18 @@ export function EmailAuthForm({
     e.preventDefault();
     setErrorMsg(null);
 
-    if (!supabaseConfigured) {
-      setErrorMsg('Supabase belum dikonfigurasi pada environment server.');
-      return;
-    }
-
     setLoading(true);
     try {
       await signInWithEmailPassword(identifier, password);
       await onSuccess();
     } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : 'Autentikasi gagal.');
+      setErrorMsg(
+        err instanceof Error
+          ? err.message
+          : !supabaseConfigured
+          ? 'Supabase belum dikonfigurasi pada environment server.'
+          : 'Autentikasi gagal.'
+      );
     } finally {
       setLoading(false);
     }

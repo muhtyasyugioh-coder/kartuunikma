@@ -59,22 +59,26 @@ export default function App() {
         // Use default branding gracefully
       }
 
-      const { supabase, config } = await getSupabaseInit();
-      setSupabaseConfigured(config.configured);
-      if (config.superAdminEmail) setSuperAdminEmail(config.superAdminEmail);
+      try {
+        const { supabase, config } = await getSupabaseInit();
+        setSupabaseConfigured(config.configured);
+        if (config.superAdminEmail) setSuperAdminEmail(config.superAdminEmail);
 
-      await syncAuth();
+        await syncAuth();
 
-      if (supabase) {
-        const { data } = supabase.auth.onAuthStateChange(async (_event, session) => {
-          try {
-            const me = await fetchAuthMe(session);
-            setAuth(me);
-          } catch {
-            setAuth(INITIAL_AUTH);
-          }
-        });
-        unsubscribe = () => data.subscription.unsubscribe();
+        if (supabase) {
+          const { data } = supabase.auth.onAuthStateChange(async (_event, session) => {
+            try {
+              const me = await fetchAuthMe(session);
+              setAuth(me);
+            } catch {
+              setAuth(INITIAL_AUTH);
+            }
+          });
+          unsubscribe = () => data.subscription.unsubscribe();
+        }
+      } catch {
+        // Fallback cleanly if config endpoint is temporarily unavailable
       }
     })();
 

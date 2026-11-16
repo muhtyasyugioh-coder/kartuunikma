@@ -213,10 +213,20 @@ export function StudentPortal({
     setExportingPdf(true);
     setActionNotice(null);
     try {
+      const hasInaccessibleStyleSheet = Array.from(document.styleSheets).some((sheet) => {
+        try {
+          void sheet.cssRules;
+          return false;
+        } catch {
+          return true;
+        }
+      });
+
       const dataUrl = await toPng(cardRef.current, {
         quality: 1,
         pixelRatio: 2.2,
         backgroundColor: '#FFFFFF',
+        skipFonts: hasInaccessibleStyleSheet,
       });
       const pdf = new jsPDF({
         orientation: 'portrait',
