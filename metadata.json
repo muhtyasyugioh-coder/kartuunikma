@@ -1,0 +1,6 @@
+{
+  "name": "Portal Kartu Ujian Akademik",
+  "description": "Sistem Informasi Distribusi Kartu Ujian UTS & UAS, Verifikasi Pengawas, dan Panel Administrasi Akademik",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
